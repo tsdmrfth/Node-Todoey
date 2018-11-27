@@ -19,13 +19,16 @@ app.post('/todos', (req, res) => {
             });
             newTodo.save()
                 .then(doc => {
-                    res.status(200).send('Successfully added todo.')
+                    res.status(200).send({
+                        text: doc.text,
+                        message: 'Successfully added todo.'
+                    })
                 }, (er) => {
                     res.status(500).send('Unable to add todo!')
                 })
 
         } else {
-            res.status(404).send('Can not add todo without "text"')
+            res.status(400).send('Can not add todo without "text"')
         }
     } else {
         res.status(400).send('Can not add todo!!')
@@ -36,4 +39,4 @@ app.listen(3400, () => {
     console.log('Started on port 3400')
 })
 
-
+module.exports = { app }
