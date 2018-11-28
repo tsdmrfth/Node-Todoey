@@ -5,7 +5,24 @@ const { ObjectID } = require('mongodb')
 const { app } = require('./../server/server')
 const { Todo } = require('./../server/model/Todo')
 
-describe('\nPOST /todos', () => {
+const mockTodos = [
+    {
+        _id: new ObjectID(),
+        text: 'Mock todo 1'
+    },
+    {
+        _id: new ObjectID(),
+        text: 'Mock todo 2'
+    }
+]
+
+beforeEach(done => {
+    Todo.remove({}).then(() => {
+        return Todo.insertMany(mockTodos)
+    }).then(() => done())
+})
+
+describe('POST /todos', () => {
 
     it('should return status code 404 if text parameter did not send', (done) => {
         request(app)
@@ -57,6 +74,36 @@ describe('GET /todos/:id', () => {
             .get(`/todos/${id}`)
             .expect(res => {
                 expect(res.body.message).toEqual('Todo not found')
+            })
+            .end(done)
+    })
+
+})
+
+describe('DELETE /todos/:id', () => {
+
+    it('should return status code 404 if id is not a valid ObjectID', (done) => {
+        const id = 'sjkdaskdj'
+        request(app)
+            .delete(`/delete/${id}`)
+            .expect(404)
+            .end(done)
+    })
+
+    it('should delete todo if id is valid', (done) => {
+        const id = mockTodos[0]._id
+        request(app)
+            .delete(`/todos/${id}`)
+            .expect(200)
+            .end(done)
+    })
+
+    it('should return deleted todo', (done) => {
+        const id = mockTodos[0]._id.toHexString()
+        request(app)
+            .delete(`/todos/${id}`)
+            .expect(res => {
+                expect(res.body.todo._id).toEqual(id)
             })
             .end(done)
     })
