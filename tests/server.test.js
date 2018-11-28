@@ -17,7 +17,7 @@ const mockTodos = [
 ]
 
 beforeEach(done => {
-    Todo.remove({}).then(() => {
+    Todo.deleteMany({}).then(() => {
         return Todo.insertMany(mockTodos)
     }).then(() => done())
 })
