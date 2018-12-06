@@ -92,6 +92,35 @@ app.delete('/todos/:id', (req, res) => {
         })
 })
 
+app.patch('/todos/:id', (req, res) => {
+    const { id } = req.params;
+    let { completed, text } = req.body
+    let completedAt = null
+
+    if (!id) {
+        return res.status(404).send('Id is required')
+    }
+
+    const isValid = ObjectID.isValid(id)
+    if (!isValid) {
+        return res.status(404).send('Id is not valid')
+    }
+
+    if (completed) {
+        completedAt = new Date().getTime()
+    } else {
+        completed = false;
+        completedAt = null
+    }
+
+    Todo.findByIdAndUpdate(id, { $set: { completed, text, completedAt } }, { new: true }, (err, doc) => {
+        if (err) {
+            return res.status(404).send('Todo not found')
+        }
+        res.send({ doc })
+    })
+})
+
 app.listen(PORT, () => {
     console.log(`Started on port ${PORT}`)
 })
