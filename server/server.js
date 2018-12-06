@@ -8,8 +8,11 @@ const { Todo } = require('./model/Todo')
 const { User } = require('./model/User')
 
 const app = express()
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(bodyParser.json())
-const PORT = process.env.PORT || 3400
+const PORT = process.env.PORT
 
 app.post('/todos', (req, res) => {
     const { body } = req
@@ -120,6 +123,33 @@ app.patch('/todos/:id', (req, res) => {
         }
         res.send({ todo: doc })
     })
+})
+
+app.post('/users', (req, res) => {
+    const { email, password, age } = req.body
+    if (!email) {
+        return res.status(400).send('Email is required')
+    }
+
+    if (!password) {
+        return res.status(400).send('Password is required')
+    }
+
+    const newUser = new User({
+        email,
+        password,
+        age
+    })
+
+    newUser.save()
+        .then(user => {
+            res.send(user)
+        }, er => {
+            if (er.code === 11000) {
+                return res.status(400).send('This email is already registered')
+            }
+            res.status(400).send(er)
+        })
 })
 
 app.listen(PORT, () => {

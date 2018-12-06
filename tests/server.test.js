@@ -4,6 +4,7 @@ const { ObjectID } = require('mongodb')
 
 const { app } = require('./../server/server')
 const { Todo } = require('./../server/model/Todo')
+const { User } = require('./../server/model/User')
 
 const mockTodos = [
     {
@@ -18,9 +19,30 @@ const mockTodos = [
     }
 ]
 
+const mockUsers = [
+    {
+        _id: new ObjectID(),
+        email: 'babalar@babalar.com',
+        password: 'babalar',
+        age: 20
+    },
+    {
+        _id: new ObjectID(),
+        email: 'babalar1@babalar.com',
+        password: 'babalar',
+        age: 20
+    }
+]
+
 beforeEach(done => {
     Todo.deleteMany({}).then(() => {
         return Todo.insertMany(mockTodos)
+    }).then(() => done())
+})
+
+beforeEach(done => {
+    User.deleteMany({}).then(() => {
+        return User.insertMany(mockUsers)
     }).then(() => done())
 })
 
@@ -147,5 +169,21 @@ describe('PATCH /todos/:id', () => {
             .end(done)
 
     })
+
+})
+
+describe('POST /users', () => {
+
+    it('should return status code 400 if email is registered', (done) => {
+        const mockUser = mockUsers[1]
+        request(app)
+            .post('/users')
+            .send(mockUser)
+            .expect(400)
+            .expect(res => {
+                expect(res.text).toEqual('This email is already registered')
+            })
+            .end(done)
+    });
 
 })
