@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha **/*test.js",
-    "watch-test": "nodemon --exec \"npm test\"",
+    "test": "export NODE_ENV=test && mocha **/*test.js",
+    "watch-test": "export NODE_ENV=test && nodemon --exec \"npm test\"",
     "start": "nodemon server/server.js"
   },
   "engines": {
