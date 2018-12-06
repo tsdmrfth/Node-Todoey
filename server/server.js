@@ -113,11 +113,11 @@ app.patch('/todos/:id', (req, res) => {
         completedAt = null
     }
 
-    Todo.findByIdAndUpdate(id, { $set: { completed, text, completedAt } }, { new: true }, (err, doc) => {
+    Todo.findOneAndUpdate(id, { $set: { completed, text, completedAt } }, { new: true }, (err, doc) => {
         if (err) {
             return res.status(404).send('Todo not found')
         }
-        res.send({ doc })
+        res.send({ todo: doc })
     })
 })
 

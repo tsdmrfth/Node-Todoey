@@ -12,7 +12,9 @@ const mockTodos = [
     },
     {
         _id: new ObjectID(),
-        text: 'Mock todo 2'
+        text: 'Mock todo 2',
+        completed: true,
+        completedAt: 322
     }
 ]
 
@@ -106,6 +108,44 @@ describe('DELETE /todos/:id', () => {
                 expect(res.body.todo._id).toEqual(id)
             })
             .end(done)
+    })
+
+})
+
+describe('PATCH /todos/:id', () => {
+
+    it('should return status code 404 if no id sent', (done) => {
+        request(app)
+            .patch('/todos')
+            .expect(404)
+            .end(done)
+    })
+
+    it('should return status code 404 and message `Id is not valid` if the id is not valid', (done) => {
+        const id = '3sdf12'
+        request(app)
+            .patch(`/todos/${id}`)
+            .expect(res => {
+                expect(res.status).toEqual(404)
+                expect(res.text).toEqual('Id is not valid')
+            })
+            .end(done)
+    })
+
+    it('should update completedAt to null if completed is false', (done) => {
+        const id = mockTodos[1]._id.toHexString()
+
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({
+                completed: false
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.completedAt).toBeNull()
+            })
+            .end(done)
+
     })
 
 })
