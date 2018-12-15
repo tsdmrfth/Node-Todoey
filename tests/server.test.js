@@ -186,4 +186,20 @@ describe('POST /users', () => {
             .end(done)
     });
 
+    it('should return token in header', (done) => {
+        const mockUser = {
+            _id: new ObjectID(),
+            email: 'babalar5@babalar.com',
+            password: 'babalar',
+            age: 20
+        }
+        request(app)
+            .post('/users')
+            .send(mockUser)
+            .expect(res => {
+                expect(res.header['x-auth']).toBeDefined()
+            })
+            .end(done)
+    })
+
 })

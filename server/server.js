@@ -142,9 +142,13 @@ app.post('/users', (req, res) => {
     })
 
     newUser.save()
-        .then(user => {
-            res.send(user)
-        }, er => {
+        .then(() => {
+            return newUser.generateToken()
+        })
+        .then(token => {
+            res.header('x-auth', token).send(newUser)
+        })
+        .catch(er => {
             if (er.code === 11000) {
                 return res.status(400).send('This email is already registered')
             }
