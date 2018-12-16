@@ -50,4 +50,20 @@ userSchema.methods.generateToken = function () {
     })
 }
 
+userSchema.statics.findByToken = function (token) {
+    const User = this
+    let decoded;
+    try {
+        decoded = JWT.verify(token, 'baba.js')
+    } catch (error) {
+        return Promise.reject({ code: 10000, message: 'User not found' })
+    }
+
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    })
+}
+
 module.exports.User = mongoose.model('User', userSchema)
