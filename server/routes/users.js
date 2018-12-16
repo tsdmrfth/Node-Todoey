@@ -33,9 +33,7 @@ router.post('/', (req, res) => {
         })
 })
 
-
-
-router.post('/me', authenticateMW, (req, res) => {
+router.get('/me', authenticateMW, (req, res) => {
     res.send(req.user)
 })
 
