@@ -57,4 +57,12 @@ router.post('/login', (req, res) => {
         })
 })
 
+router.delete('/token', authenticateMW, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.send({ message: 'Successfully deleted' })
+    }, () => {
+        res.status(400).send()
+    })
+})
+
 module.exports = router
