@@ -1,6 +1,7 @@
 const expect = require('expect')
 const request = require('supertest')
 const { ObjectID } = require('mongodb')
+const JWT = require('jsonwebtoken')
 
 const { app } = require('./../server/server')
 const { Todo } = require('./../server/model/Todo')
@@ -19,6 +20,7 @@ const mockTodos = [
     }
 ]
 
+const user2Id = new ObjectID()
 const mockUsers = [
     {
         _id: new ObjectID(),
@@ -27,10 +29,16 @@ const mockUsers = [
         age: 20
     },
     {
-        _id: new ObjectID(),
+        _id: user2Id,
         email: 'babalar1@babalar.com',
         password: 'babalar',
-        age: 20
+        age: 20,
+        tokens: [
+            {
+                access: 'auth',
+                token: JWT.sign({ _id: user2Id, access: 'auth' }, 'baba.js').toString()
+            }
+        ]
     }
 ]
 
@@ -181,7 +189,7 @@ describe('POST /users', () => {
             .send(mockUser)
             .expect(400)
             .expect(res => {
-                expect(res.text).toEqual('This email is already registered')
+                expect(res.body.message).toEqual('This email is already registered')
             })
             .end(done)
     });
@@ -198,6 +206,23 @@ describe('POST /users', () => {
             .send(mockUser)
             .expect(res => {
                 expect(res.header['x-auth']).toBeDefined()
+            })
+            .end(done)
+    })
+
+})
+
+describe('POST /users/me', () => {
+
+    it('should return same token if user is stored in database', (done) => {
+        const token = mockUsers[1].tokens[0].token
+        request(app)
+            .get('/api/users/me')
+            .set('x-auth', token)
+            .expect(200)
+            .expect(res => {
+                console.log(res.body, 'body')
+                expect(res.body._id).toContain(mockUsers[1]._id)
             })
             .end(done)
     })

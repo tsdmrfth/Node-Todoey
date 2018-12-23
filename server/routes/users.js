@@ -3,7 +3,6 @@ const { User } = require('../model/User')
 const { authenticateMW } = require('./../middleware/authenticate')
 
 router.post('/', (req, res) => {
-    console.log('burdayim')
     const { email, password, age } = req.body
     if (!email) {
         return res.status(400).send('Email is required')
@@ -21,16 +20,14 @@ router.post('/', (req, res) => {
 
     newUser.save()
         .then(() => {
-            console.log('ordayim')
             return newUser.generateToken()
         })
         .then(token => {
-            console.log('baba burda')
             res.header('x-auth', token).send({ newUser, token })
         })
         .catch(er => {
             if (er.code === 11000) {
-                return res.status(400).send('This email is already registered')
+                return res.status(400).send({ status: 11000, message: 'This email is already registered' })
             }
             res.status(400).send(er)
         })
