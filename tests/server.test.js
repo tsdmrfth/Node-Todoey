@@ -7,19 +7,6 @@ const { app } = require('./../server/server')
 const { Todo } = require('./../server/model/Todo')
 const { User } = require('./../server/model/User')
 
-const mockTodos = [
-    {
-        _id: new ObjectID(),
-        text: 'Mock todo 1'
-    },
-    {
-        _id: new ObjectID(),
-        text: 'Mock todo 2',
-        completed: true,
-        completedAt: 322
-    }
-]
-
 const user2Id = new ObjectID()
 const mockUsers = [
     {
@@ -42,6 +29,21 @@ const mockUsers = [
     }
 ]
 
+const mockTodos = [
+    {
+        _id: new ObjectID(),
+        text: 'Mock todo 1',
+        owner: user2Id
+    },
+    {
+        _id: new ObjectID(),
+        text: 'Mock todo 2',
+        completed: true,
+        completedAt: 322,
+        owner: user2Id
+    }
+]
+
 beforeEach(done => {
     Todo.deleteMany({}).then(() => {
         return Todo.insertMany(mockTodos)
@@ -60,7 +62,7 @@ describe('POST /todos', () => {
         request(app)
             .post('/api/todos')
             .send({})
-            .expect(400)
+            .expect(401)
             .end(done)
     });
 
@@ -68,26 +70,14 @@ describe('POST /todos', () => {
         const text = 'Text to test'
         request(app)
             .post('/api/todos')
-            .send({ text })
-            .expect(200)
+            .send({ text, owner: user2Id })
+            .expect(401)
             .end(done)
     });
 
     after('store', (done) => {
         Todo.deleteOne({ text: 'Text to test' }).then(() => done())
     })
-
-    it('should return back text that is sent', (done) => {
-        const text = 'Hello test'
-        request(app)
-            .post('/api/todos')
-            .send({ text })
-            .expect(res => {
-                expect(res.body.text).toBe(text)
-            })
-            .end(done)
-    })
-
 })
 
 describe('GET /todos/:id', () => {

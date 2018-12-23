@@ -1,9 +1,10 @@
 const { ObjectID } = require('mongodb')
-
-const { Todo } = require('./../model/Todo')
 const router = require('express').Router();
 
-router.post('/', (req, res) => {
+const { Todo } = require('./../model/Todo')
+const { authenticateMW } = require('./../middleware/authenticate')
+
+router.post('/', authenticateMW, (req, res) => {
     const { body } = req
     if (body) {
         const { text, completed } = body
@@ -19,7 +20,7 @@ router.post('/', (req, res) => {
                         message: 'Successfully added todo.'
                     })
                 }, (er) => {
-                    res.status(500).send('Unable to add todo!')
+                    res.status(500).send(er)
                 })
 
         } else {
@@ -30,7 +31,7 @@ router.post('/', (req, res) => {
     }
 })
 
-router.get('/', (req, res) => {
+router.get('/', authenticateMW, (req, res) => {
     Todo.find()
         .then(todos => {
             res.send({ todos })
