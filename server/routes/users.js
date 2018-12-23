@@ -23,7 +23,7 @@ router.post('/', (req, res) => {
             return newUser.generateToken()
         })
         .then(token => {
-            res.header('x-auth', token).send({ newUser, token })
+            res.header('x-auth', token).send({ newUser })
         })
         .catch(er => {
             if (er.code === 11000) {
@@ -49,7 +49,7 @@ router.post('/login', (req, res) => {
     User.findByCredentials(email, password)
         .then(user => {
             return user.generateToken().then(token => {
-                res.header('x-auth', token).send({ user, token })
+                res.header('x-auth', token).send({ user })
             })
         })
         .catch(err => {
