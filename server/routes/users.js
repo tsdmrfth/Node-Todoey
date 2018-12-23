@@ -37,4 +37,24 @@ router.get('/me', authenticateMW, (req, res) => {
     res.send(req.user)
 })
 
+router.post('/login', (req, res) => {
+    const { email, password, age } = req.body
+    if (!email) {
+        return res.status(400).send('Email is required')
+    }
+    if (!password) {
+        return res.status(400).send('Password is required')
+    }
+
+    User.findByCredentials(email, password)
+        .then(user => {
+            return user.generateToken().then(token => {
+                res.header('x-auth', token).send({ user, token })
+            })
+        })
+        .catch(err => {
+            res.status(400).send(err)
+        })
+})
+
 module.exports = router

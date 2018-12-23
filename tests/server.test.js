@@ -221,10 +221,53 @@ describe('POST /users/me', () => {
             .set('x-auth', token)
             .expect(200)
             .expect(res => {
-                console.log(res.body, 'body')
                 expect(res.body._id).toContain(mockUsers[1]._id)
             })
             .end(done)
     })
 
+})
+
+describe('POST /api/users/me', (done) => {
+    it('should return status code 400 if email is not sent', (done) => {
+        request(app)
+            .post('/api/users/login')
+            .send({ password: 'djkasda' })
+            .expect(400)
+            .end(done)
+    })
+    it('should return status code 400 if password is not sent', (done) => {
+        request(app)
+            .post('/api/users/login')
+            .send({ email: 'daasdas' })
+            .expect(400)
+            .end(done)
+    })
+    it('should return return status 19000 code in body if any user not found', (done) => {
+        request(app)
+            .post('/api/users/login')
+            .send({ email: 'dhdh@mms', password: 'dasd' })
+            .expect(res => {
+                expect(res.body.status).toEqual(19000)
+            })
+            .end(done)
+    })
+    it('should return invalid credentials status code if password is not true', (done) => {
+        request(app)
+            .post('/api/users/login')
+            .send({ email: 'babalar@babalar.com', password: 'adjkasjad' })
+            .expect(res => {
+                expect(res.body.status).toEqual(19100)
+            })
+            .end(done)
+    })
+    it('should return user if email and password are correct', (done) => {
+        request(app)
+            .post('/api/users/login')
+            .send({ email: 'babalar@babalar.com', password: 'babalar' })
+            .expect(res => {
+                expect(res.body.user.email).toEqual('babalar@babalar.com')
+            })
+            .end(done)
+    })
 })
