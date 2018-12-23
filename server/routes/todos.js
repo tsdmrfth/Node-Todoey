@@ -11,7 +11,8 @@ router.post('/', authenticateMW, (req, res) => {
         if (text) {
             const newTodo = new Todo({
                 text,
-                completed: completed || false
+                completed: completed || false,
+                owner: req.user._id
             });
             newTodo.save()
                 .then(doc => {

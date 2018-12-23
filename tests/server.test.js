@@ -78,6 +78,7 @@ describe('POST /todos', () => {
     after('store', (done) => {
         Todo.deleteOne({ text: 'Text to test' }).then(() => done())
     })
+
 })
 
 describe('GET /todos/:id', () => {
