@@ -11,8 +11,8 @@ const authenticateMW = (req, res, next) => {
         req.token = token
         next()
     }).catch(e => {
-        const { code, message } = e
-        res.status(401).send({ code, message })
+        console.log(e, 'error')
+        res.status(401).send(e)
     })
 }
 

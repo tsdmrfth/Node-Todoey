@@ -50,7 +50,7 @@ describe('POST /todos', () => {
 
     it('should return status code 404 if text parameter did not send', (done) => {
         request(app)
-            .post('/todos')
+            .post('/api/todos')
             .send({})
             .expect(400)
             .end(done)
@@ -59,7 +59,7 @@ describe('POST /todos', () => {
     const store = it('should save todo if text is sent', (done) => {
         const text = 'Text to test'
         request(app)
-            .post('/todos')
+            .post('/api/todos')
             .send({ text })
             .expect(200)
             .end(done)
@@ -72,7 +72,7 @@ describe('POST /todos', () => {
     it('should return back text that is sent', (done) => {
         const text = 'Hello test'
         request(app)
-            .post('/todos')
+            .post('/api/todos')
             .send({ text })
             .expect(res => {
                 expect(res.body.text).toBe(text)
@@ -87,7 +87,7 @@ describe('GET /todos/:id', () => {
     it('should return status code 404 if id is not a valid ObjectID', (done) => {
         const id = '31283udsjfkads'
         request(app)
-            .get(`/todos/${id}`)
+            .get(`/api/todos/${id}`)
             .expect(404)
             .end(done)
     })
@@ -95,7 +95,7 @@ describe('GET /todos/:id', () => {
     it('should return 404 with Todo not found message if no todo', (done) => {
         const id = new ObjectID().toHexString()
         request(app)
-            .get(`/todos/${id}`)
+            .get(`/api/todos/${id}`)
             .expect(res => {
                 expect(res.body.message).toEqual('Todo not found')
             })
@@ -109,7 +109,7 @@ describe('DELETE /todos/:id', () => {
     it('should return status code 404 if id is not a valid ObjectID', (done) => {
         const id = 'sjkdaskdj'
         request(app)
-            .delete(`/delete/${id}`)
+            .delete(`/api/todos/${id}`)
             .expect(404)
             .end(done)
     })
@@ -117,7 +117,7 @@ describe('DELETE /todos/:id', () => {
     it('should delete todo if id is valid', (done) => {
         const id = mockTodos[0]._id
         request(app)
-            .delete(`/todos/${id}`)
+            .delete(`/api/todos/${id}`)
             .expect(200)
             .end(done)
     })
@@ -125,7 +125,7 @@ describe('DELETE /todos/:id', () => {
     it('should return deleted todo', (done) => {
         const id = mockTodos[0]._id.toHexString()
         request(app)
-            .delete(`/todos/${id}`)
+            .delete(`/api/todos/${id}`)
             .expect(res => {
                 expect(res.body.todo._id).toEqual(id)
             })
@@ -138,7 +138,7 @@ describe('PATCH /todos/:id', () => {
 
     it('should return status code 404 if no id sent', (done) => {
         request(app)
-            .patch('/todos')
+            .patch('/api/todos')
             .expect(404)
             .end(done)
     })
@@ -146,7 +146,7 @@ describe('PATCH /todos/:id', () => {
     it('should return status code 404 and message `Id is not valid` if the id is not valid', (done) => {
         const id = '3sdf12'
         request(app)
-            .patch(`/todos/${id}`)
+            .patch(`/api/todos/${id}`)
             .expect(res => {
                 expect(res.status).toEqual(404)
                 expect(res.text).toEqual('Id is not valid')
@@ -158,7 +158,7 @@ describe('PATCH /todos/:id', () => {
         const id = mockTodos[1]._id.toHexString()
 
         request(app)
-            .patch(`/todos/${id}`)
+            .patch(`/api/todos/${id}`)
             .send({
                 completed: false
             })
@@ -177,7 +177,7 @@ describe('POST /users', () => {
     it('should return status code 400 if email is registered', (done) => {
         const mockUser = mockUsers[1]
         request(app)
-            .post('/users')
+            .post('/api/users')
             .send(mockUser)
             .expect(400)
             .expect(res => {
@@ -194,7 +194,7 @@ describe('POST /users', () => {
             age: 20
         }
         request(app)
-            .post('/users')
+            .post('/api/users')
             .send(mockUser)
             .expect(res => {
                 expect(res.header['x-auth']).toBeDefined()
