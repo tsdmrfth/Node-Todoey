@@ -42,18 +42,20 @@ router.get('/', authenticateMW, (req, res) => {
         })
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', authenticateMW, (req, res) => {
     const { id } = req.params
     if (id) {
         const isValidId = ObjectID.isValid(id)
         if (!isValidId) {
             return res.status(404).send('Id is not valid')
         }
-        Todo.findById(id).then(todo => {
+        Todo.findOne({
+            _id: id,
+            owner: req.user._id
+        }).then(todo => {
             if (!todo) {
                 return res.status(404).send({ message: 'Todo not found' })
             }
-
             res.send({ todo })
         }).catch(err => {
             res.status(400).send(err)
@@ -63,7 +65,7 @@ router.get('/:id', (req, res) => {
     }
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authenticateMW, (req, res) => {
     const { id } = req.params
     if (!id) {
         return res.status(404).send('Id is required')
@@ -74,20 +76,21 @@ router.delete('/:id', (req, res) => {
         return res.status(404).send('Id is not valid')
     }
 
-    Todo.findByIdAndDelete(id)
-        .then(todo => {
-            if (!todo) {
-                return res.status(404).send('Todo not found')
-            }
+    Todo.findOneAndDelete({
+        _id: id,
+        owner: req.user._id
+    }).then(todo => {
+        if (!todo) {
+            return res.status(404).send('Todo not found')
+        }
 
-            res.send({ message: 'Succesfully deleted', todo })
-        })
-        .catch(err => {
-            res.status(400).send(err)
-        })
+        res.send({ message: 'Succesfully deleted', todo })
+    }).catch(err => {
+        res.status(400).send(err)
+    })
 })
 
-router.patch('/:id', (req, res) => {
+router.patch('/:id', authenticateMW, (req, res) => {
     const { id } = req.params;
     let { completed, text } = req.body
     let completedAt = null
@@ -108,7 +111,10 @@ router.patch('/:id', (req, res) => {
         completedAt = null
     }
 
-    Todo.findOneAndUpdate(id, { $set: { completed, text, completedAt } }, { new: true }, (err, doc) => {
+    Todo.findOneAndUpdate({
+        _id: id,
+        owner: req.user._id
+    }, { $set: { completed, text, completedAt } }, { new: true }, (err, doc) => {
         if (err) {
             return res.status(404).send('Todo not found')
         }

@@ -9,10 +9,11 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        minlength: 5,
+        minlength: 1,
         unique: true,
         validate: {
-            validator: validator.isEmail
+            validator: validator.isEmail,
+            message: '{VALUE} is not a valid email'
         }
     },
     password: {
@@ -44,7 +45,7 @@ userSchema.methods.toJSON = function () {
 userSchema.methods.generateToken = function () {
     const user = this
     const access = 'auth'
-    const token = JWT.sign({ _id: user._id.toHexString(), access }, 'baba.js').toString()
+    const token = JWT.sign({ _id: user._id.toHexString(), access }, process.env.JWT_SECRET).toString()
     user.tokens.push({ access, token })
     return user.save().then(() => {
         return token
@@ -55,7 +56,7 @@ userSchema.statics.findByToken = function (token) {
     const User = this
     let decoded;
     try {
-        decoded = JWT.verify(token, 'baba.js')
+        decoded = JWT.verify(token, process.env.JWT_SECRET)
     } catch (error) {
         return Promise.reject({ code: 10000, message: 'User not found' })
     }
