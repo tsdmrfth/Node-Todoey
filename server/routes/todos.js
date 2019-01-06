@@ -18,7 +18,8 @@ router.post('/', authenticateMW, (req, res) => {
                 .then(doc => {
                     res.status(200).send({
                         text: doc.text,
-                        message: 'Successfully added todo.'
+                        message: 'Successfully added todo.',
+                        id: doc._id
                     })
                 }, (er) => {
                     res.status(500).send(er)
